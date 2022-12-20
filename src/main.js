@@ -3,8 +3,9 @@ const express = require('express');
 const { Server: HttpServer } = require('http');
 const { Server: IO } = require('socket.io');
 
-const products = require('../db/queries_prod.js');
-const messages = require('../db/queries_msj.js');
+const ContenedorSQL = require('../contenedores/contenedorSQL');
+const config = require('./config');
+
 const { engine } = require("express-handlebars");
 
 //--------------------------------------------
@@ -17,26 +18,29 @@ app.engine('handlebars', engine());
 app.set('views', '../public/plantillas');
 app.set('view engine', 'handlebars');
 
+const productosApi = new ContenedorSQL(config.mariaDB, 'productos');
+const mensajesApi = new ContenedorSQL(config.sqlite3, 'mensajes');
+
 //--------------------------------------------
 // configuro el socket
 
 io.on('connection', async socket => {
     //productos
-    socket.emit('product', products.getAll());
+    socket.emit('product', productosApi.getAll());
 
     socket.on('new-product', data => {
         products.addProducto(data);
-        io.sockets.emit('product', products.getAll());
+        io.sockets.emit('product', productosApi.getAll());
     })
 
     //mensajes
-    const msg = messages.getAll();
+    const msg = mensajesApi.getAll();
     socket.emit('message', msg);
     
 
     socket.on('new-message', data => {
         messages.addMessage(data);
-        io.sockets.emit('message', messages.getAll())
+        io.sockets.emit('message', mensajesApi.getAll())
     })
 });
 
