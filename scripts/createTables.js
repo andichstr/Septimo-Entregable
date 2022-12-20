@@ -1,5 +1,5 @@
-import knex from 'knex'
-import config from '../src/config.js'
+const knex = require('knex');
+const config = require('../src/config.js');
 
 //------------------------------------------
 // productos en MariaDb
@@ -16,7 +16,7 @@ try {
     .then(() => console.log("table created"))
     .catch((err) => { console.log(err); throw err })
     .finally(() => {
-        knex.destroy();
+        mariaDbClient.destroy();
     });
 
     console.log('tabla productos en mariaDb creada con éxito')
@@ -39,7 +39,7 @@ try {
     .then(() => console.log("table created"))
     .catch((err) => { console.log(err); throw err })
     .finally(() => {
-        knex.destroy();
+        sqliteClient.destroy();
     });
 
     console.log('tabla mensajes en sqlite3 creada con éxito')
